@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>협동 학습 활동지 & 결과 확인</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: 'Pretendard', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 pb-12">
+
+  <!-- Header -->
+  <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">
+          <i data-lucide="book-open" class="w-7 h-7"></i>
+          협동 학습 활동지 & 실시간 결과
+        </h1>
+        <p class="text-indigo-100 text-sm mt-1">지켜야 할 약속을 준수하며 모둠원과 함께 의견을 공유해요!</p>
+      </div>
+      <div class="flex items-center gap-2 bg-indigo-700/60 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-medium border border-indigo-500/30">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>실시간 동기화 중</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-5xl mx-auto px-4 mt-6 space-y-6">
+
+    <!-- 📌 지켜야 할 약속 (안내 카드) -->
+    <section class="bg-amber-50 border border-amber-200 rounded-xl p-5 shadow-sm">
+      <h2 class="text-lg font-bold text-amber-900 flex items-center gap-2 mb-3">
+        <i data-lucide="shield-check" class="w-5 h-5 text-amber-600"></i>
+        지켜야 할 약속
+      </h2>
+      <ul class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-amber-800">
+        <li class="flex items-start gap-2 bg-white/70 p-2.5 rounded-lg border border-amber-100">
+          <span class="font-bold text-amber-600">1.</span> 경청하기: 다른 친구의 생각을 존중하고 끝까지 들어줍니다.
+        </li>
+        <li class="flex items-start gap-2 bg-white/70 p-2.5 rounded-lg border border-amber-100">
+          <span class="font-bold text-amber-600">2.</span> 적극적으로 참여하기: 나만의 의견을 정성껏 작성합니다.
+        </li>
+        <li class="flex items-start gap-2 bg-white/70 p-2.5 rounded-lg border border-amber-100">
+          <span class="font-bold text-amber-600">3.</span> 바른 언어 사용: 모두가 즐겁게 배울 수 있도록 고운 말을 씁니다.
+        </li>
+      </ul>
+    </section>
+
+    <!-- 📝 입력 칸 및 결과 보기 영역 -->
+    <section class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+      <div class="border-b border-slate-100 pb-4 mb-5 flex justify-between items-center">
+        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <i data-lucide="pen-tool" class="w-6 h-6 text-indigo-600"></i>
+          내 생각 작성하기 & 결과 확인
+        </h2>
+        <span id="saveStatus" class="text-xs font-medium text-slate-400 flex items-center gap-1">
+          <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> 자동 저장 준비 완료
+        </span>
+      </div>
+
+      <!-- 입력 Form -->
+      <form id="activityForm" class="space-y-4" onsubmit="handleFormSubmit(event)">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">주제 / 활동명</label>
+          <input type="text" id="topic" required placeholder="예: 환경 보호를 위한 우리의 실천 방안"
+            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">내 의견 및 탐구 내용</label>
+          <textarea id="content" rows="4" required placeholder="의견이나 아이디어를 상세히 작성해 주세요..."
+            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="clearForm()" 
+            class="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1.5">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 초기화
+          </button>
+          <button type="submit" id="submitBtn"
+            class="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-lg shadow-sm transition-all flex items-center gap-1.5">
+            <i data-lucide="send" class="w-4 h-4"></i> 제출 및 아래에 결과 보기
+          </button>
+        </div>
+      </form>
+
+      <!-- 🔍 바로 아래 결과 보기 영역 -->
+      <div id="resultBox" class="mt-8 border-t border-dashed border-indigo-200 pt-6 hidden">
+        <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-5 relative">
+          <span class="absolute top-3 right-3 bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+            방금 입력한 결과
+          </span>
+          <h3 class="text-sm font-bold text-indigo-900 mb-3 flex items-center gap-1.5">
+            <i data-lucide="file-check-2" class="w-4 h-4 text-indigo-600"></i>
+            입력 결과 즉시 확인
+          </h3>
+          <div class="space-y-2 text-sm bg-white p-4 rounded-lg border border-indigo-100 shadow-sm">
+            <div class="flex gap-2">
+              <span class="font-bold text-slate-500 w-20 flex-shrink-0">활동 주제:</span>
+              <span id="resTopic" class="font-semibold text-indigo-700"></span>
+            </div>
+            <div class="flex gap-2 pt-2 border-t border-slate-100">
+              <span class="font-bold text-slate-500 w-20 flex-shrink-0">작성 내용:</span>
+              <p id="resContent" class="text-slate-700 whitespace-pre-wrap flex-1 leading-relaxed"></p>
+            </div>
+            <div class="text-right text-[11px] text-slate-400 pt-1">
+              제출 시간: <span id="resTime"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 📊 제출 현황 보기 -->
+    <section class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <i data-lucide="users" class="w-6 h-6 text-emerald-600"></i>
+            전체 제출 현황 및 공유 모둠판
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">여러 명의 동료가 동시에 작성한 내용이 실시간으로 모여 업데이트됩니다.</p>
+        </div>
+        <button onclick="fetchSubmissions()" 
+          class="p-2 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition-colors" title="새로고침">
+          <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div id="submissionList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- 동적 제출 리스트 삽입 영역 -->
+        <div class="col-span-full text-center py-8 text-slate-400 text-sm">
+          등록된 제출 내역을 불러오는 중입니다...
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Lucide Icons 초기화
+    lucide.createIcons();
+
+    // 입력 내용 자동 저장 (LocalStorage)
+    const AUTO_SAVE_KEY = 'coop_activity_draft';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDraft();
+      setupAutoSave();
+      fetchSubmissions();
+      // 5초 간격으로 실시간 동기화
+      setInterval(fetchSubmissions, 5000);
+    });
+
+    // 초안 로드
+    function loadDraft() {
+      const saved = localStorage.getItem(AUTO_SAVE_KEY);
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          document.getElementById('topic').value = data.topic || '';
+          document.getElementById('content').value = data.content || '';
+        } catch (e) {
+          console.error('자동저장 데이터 로드 실패', e);
+        }
+      }
+    }
+
+    // 초안 입력 시 자동 저장
+    function setupAutoSave() {
+      const inputs = ['topic', 'content'];
+      inputs.forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+          const draft = {
+            topic: document.getElementById('topic').value,
+            content: document.getElementById('content').value
+          };
+          localStorage.setItem(AUTO_SAVE_KEY, JSON.stringify(draft));
+          
+          const status = document.getElementById('saveStatus');
+          status.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-500"></i> 임시 저장됨`;
+          lucide.createIcons();
+        });
+      });
+    }
+
+    // 폼 제출 처리
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const topic = document.getElementById('topic').value.trim();
+      const content = document.getElementById('content').value.trim();
+
+      if (!topic || !content) {
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = '저장 중...';
+
+      const payload = {
+        studentName: '익명',
+        topic: topic,
+        content: content,
+        timestamp: new Date().toLocaleString('ko-KR')
+      };
+
+      // 1. 바로 아래 결과 화면에 출력
+      showImmediateResult(payload);
+
+      // 2. Apps Script / 서버 연동 저장
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(() => {
+            onSubmitSuccess();
+          })
+          .withFailureHandler((err) => {
+            console.error(err);
+            onSubmitSuccess();
+          })
+          .saveSubmission(payload);
+      } else {
+        saveToLocalStorage(payload);
+        setTimeout(onSubmitSuccess, 400);
+      }
+    }
+
+    // 제출 성공 후 처리
+    function onSubmitSuccess() {
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> 제출 및 아래에 결과 보기`;
+      
+      localStorage.removeItem(AUTO_SAVE_KEY);
+      document.getElementById('saveStatus').innerHTML = `<i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-indigo-500"></i> 제출 완료됨`;
+
+      fetchSubmissions();
+      lucide.createIcons();
+    }
+
+    // 바로 아래 결과 보기 표시 함수
+    function showImmediateResult(data) {
+      document.getElementById('resTopic').innerText = data.topic;
+      document.getElementById('resContent').innerText = data.content;
+      document.getElementById('resTime').innerText = data.timestamp;
+
+      const resultBox = document.getElementById('resultBox');
+      resultBox.classList.remove('hidden');
+      
+      resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // 폼 초기화
+    function clearForm() {
+      document.getElementById('activityForm').reset();
+      localStorage.removeItem(AUTO_SAVE_KEY);
+      document.getElementById('resultBox').classList.add('hidden');
+      document.getElementById('saveStatus').innerHTML = `<i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> 초기화 완료`;
+      lucide.createIcons();
+    }
+
+    // 로컬 스토리지에 결과 저장
+    function saveToLocalStorage(data) {
+      const current = JSON.parse(localStorage.getItem('coop_submissions') || '[]');
+      current.unshift(data);
+      localStorage.setItem('coop_submissions', JSON.stringify(current));
+    }
+
+    // 제출 목록 가져오기
+    function fetchSubmissions() {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(renderSubmissions)
+          .getSubmissions();
+      } else {
+        const localData = JSON.parse(localStorage.getItem('coop_submissions') || '[]');
+        renderSubmissions(localData);
+      }
+    }
+
+    // 제출 목록 랜더링
+    function renderSubmissions(list) {
+      const container = document.getElementById('submissionList');
+      if (!list || list.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full text-center py-8 text-slate-400 text-sm">
+            아직 제출된 내용이 없습니다. 첫번째로 의견을 공유해 보세요!
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(item => `
+        <div class="border border-slate-200 bg-slate-50/50 rounded-lg p-4 space-y-2 hover:border-indigo-200 transition-colors">
+          <div class="flex justify-between items-center gap-2">
+            <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 inline-block px-2 py-0.5 rounded">
+              ${escapeHtml(item.topic)}
+            </span>
+            <span class="text-[11px] text-slate-400">${escapeHtml(item.timestamp || '')}</span>
+          </div>
+          <p class="text-xs text-slate-600 whitespace-pre-wrap leading-relaxed">${escapeHtml(item.content)}</p>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
